@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Clone</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <!-- Side navigation -->
+        <div class="sidenav">
+            <!-- Twitter icon -->
+             <div class="twitter_div">
+                <a class="twitter_icon" href="#"><img src="images/twitter.svg" alt="twitter icon"></a>
+             </div>
+             <div class="twitter_div">
+                <h2>Pipper</h2>
+             </div>
+             
+            
+
+            <!-- Trigger/Open The Modal -->
+            <a href="#"><button id="pipButton">New pip</button></a>
+            <a href="#">Home</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+        </div>
+        
+    </header>
+
+    <!-- Page content -->
+    <div class="main">
+        <div class="container">
+            <main>
+    
+                <!-- The Modal -->
+                <div id="myModal" class="modal">
+    
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <span class="close">&times;</span>
+                      <h2>Write your pip</h2>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <div class="tweet-box">
+                        <div>Username</div>
+                        <input id="username" type="text">
+                        
+
+                        <label for="avatar">Choose an avatar:</label>
+
+                        <select name="avatars" id="avatars">
+                            <option value="Christopher">Christopher</option>
+                            <option value="Sarah">Sarah</option>
+                            <option value="Wyatt">Wyatt</option>
+                            <option value="Liam">Liam</option>
+                            <option value="Vivian">Vivian</option>
+                            <option value="Robert">Robert</option>
+                            <option value="Ryan">Ryan</option>
+                            <option value="Sophia">Sophia</option>
+                            <option value="Katherine">Katherine</option>
+                            <option value="Mason">Mason</option>
+                            <option value="Ryker">Ryker</option>
+                            <option value="Aiden">Aiden</option>
+                            <option value="Luis">Luis</option>
+                            <option value="George">George</option>
+                            <option value="Avery">Avery</option>
+                            <option value="Eliza">Eliza</option>
+                            <option value="Brian">Brian</option>
+                            <option value="Emery">Emery</option>
+                        </select>
+
+                            <textarea id="tweetContent" placeholder="What's happening?" maxlength="255"></textarea>
+                            <div id="tweetCharacters">255</div>
+                            <button id="tweetButton">Tweet</button>
+                        </div>
+                    </div>
+                  </div>
+    
+                </div>
+                <div class="tweet-feed" id="tweetFeed"></div>
+            </main>
+            <aside>
+                <div class="sidebar">
+                    <h2>Trends</h2>
+                    <ul>
+                        <li>#Trend1</li>
+                        <li>#Trend2</li>
+                        <li>#Trend3</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+    
+
+
+    <script>
+        var a = document.getElementById("tweetContent"),
+        b = document.getElementById("tweetCharacters");
+        a.addEventListener("keyup", () => b.innerHTML = a.maxLength - a.value.length);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchTweets();
+
+            document.getElementById('tweetButton').addEventListener('click', function() {
+                const tweetContent = document.getElementById('tweetContent').value;
+                const username = document.getElementById('username').value;
+                const avatar = document.getElementById('avatars').value;
+
+                if (tweetContent && username) {
+                    postTweet(tweetContent, username, avatar);
+                } else {
+                    alert('Please enter a username and tweet content');
+                }
+            });
+        });
+
+        function fetchTweets() {
+            fetch('http://localhost:8000/')
+                .then(response => response.json())
+                .then(data => {
+                    const tweetFeed = document.getElementById('tweetFeed');
+                    tweetFeed.innerHTML = '';
+                    data.forEach(tweet => {
+                        const tweetElement = document.createElement('div');
+                        tweetElement.classList.add('tweet');
+                        tweetElement.innerHTML = `
+                            <div><div class="tweet-avatar"><img src="https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${tweet.avatar}" height="50px width="50px" alt="avatar" /></div></div>
+                            <div><div class="tweet-username">${tweet.username}</div>
+                            <div class="tweet-content">${tweet.tweet_content}</div>
+                            <div class="tweet-date">${tweet.created_at}</div></div>
+                        `;
+                        tweetFeed.appendChild(tweetElement);
+                    });
+                })
+                .catch(error => console.error('Error fetching tweets:', error));
+        }
+
+        function postTweet(tweetContent, username, avatar) {
+            fetch('http://localhost:8000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tweet_content: tweetContent, username: username, avatar: avatar})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('tweetContent').value = '';
+                fetchTweets();
+            })
+            .catch(error => console.error('Error posting tweet:', error));
+        }
+
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("pipButton");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on the button, open the modal
+        btn.onclick = function() {
+        modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        }
+    </script>
+</body>
+</html>
